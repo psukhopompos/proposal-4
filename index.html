@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validador Fiscal - POC | Análise de Estrutura Fiscal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --success-dark: #15803d;
+            --neutral-light: #dbeafe;
+            --neutral-dark: #1e40af;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --border: #e2e8f0;
+            --radius: 0.75rem;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        /* Header (Hero) */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 4rem 2rem 6rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+        }
+
+        .hero .subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            opacity: 0.9;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            max-width: 700px;
+        }
+
+        .hero .highlight-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 700px;
+            margin-top: 2.5rem;
+        }
+        
+        /* General Section Styling */
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 3rem;
+            max-width: 700px;
+        }
+        
+        /* Metrics Cards */
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .metric-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+        
+        /* Comparison Table */
+        .table-container {
+            background: white;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .comparison-table th {
+            background: var(--bg-light);
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        .comparison-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .value-xml { color: var(--success-dark); font-weight: 600; font-family: 'SF Mono', 'Courier New', monospace; }
+        .value-sap { color: var(--text-light); font-weight: 600; font-family: 'SF Mono', 'Courier New', monospace; }
+
+        .badge {
+            background: #f1f5f9;
+            color: var(--text-light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Phases/Roadmap */
+        .phase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .phase-card {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .phase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .phase-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .phase-number { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; background: var(--primary); color: white; border-radius: 50%; font-size: 1.25rem; font-weight: 700; flex-shrink: 0; }
+        .phase-card h3 { font-size: 1.25rem; color: var(--text-dark); }
+        .phase-status { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 0.25rem 0.75rem; border-radius: 99px; margin-bottom: 1rem; display: inline-block; }
+        .phase-status.completed { background: var(--success-light); color: var(--success-dark); }
+        .phase-status.planned { background: var(--neutral-light); color: var(--neutral-dark); }
+        .phase-card p { color: var(--text-light); line-height: 1.7; margin-bottom: 1rem; }
+        .phase-list { list-style: none; margin: 1rem 0; }
+        .phase-list li { padding-left: 1.5rem; position: relative; color: var(--text-light); font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .phase-list li::before { content: '✓'; position: absolute; left: 0; color: var(--success); font-weight: 700; }
+        .phase-details { margin-top: 1.5rem; font-size: 0.9rem; color: var(--primary); font-weight: 600; }
+        
+        /* Call to Action */
+        .cta-section { background: var(--primary-dark); color: white; padding: 3rem 2rem; border-radius: var(--radius); margin: 3rem 0; text-align: center; }
+        .cta-section h2 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+        .cta-section p { font-size: 1.1rem; margin-bottom: 1.5rem; opacity: 0.9; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .cta-button { display: inline-block; padding: 1rem 2.5rem; background: white; color: var(--primary); font-size: 1rem; font-weight: 600; border-radius: 0.5rem; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; box-shadow: var(--shadow); }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        
+        /* Insight Box */
+        .insight-box { background: #fff; border-left: 4px solid var(--primary); padding: 1.5rem; border-radius: 0 0.5rem 0.5rem 0; margin: 2rem 0; box-shadow: var(--shadow); }
+        .insight-box h4 { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-dark); }
+        
+        /* Credibility Section */
+        .credibility-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .credibility-card { background: white; padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border); }
+        .credibility-card h4 { margin-bottom: 0.75rem; color: var(--text-dark); }
+        .credibility-card ul { list-style: none; padding: 0; }
+        .credibility-card li { padding: 0.25rem 0; color: var(--text-light); font-size: 0.9rem; }
+        
+        /* Footer */
+        .footer { background: var(--bg-dark); color: white; padding: 2.5rem 2rem; text-align: center; margin-top: 4rem; font-size: 0.9rem; }
+        .footer p { margin: 0.5rem 0; opacity: 0.8; }
+        
+        /* Animations & Responsiveness */
+        .animated-item { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .animated-item.is-visible { opacity: 1; transform: translateY(0); }
+        
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .hero { padding: 3rem 1rem 4rem; }
+            .section { padding: 3rem 0; }
+        }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <div class="container">
+            <h1>Conseguimos parsear a estrutura fiscal</h1>
+            <p class="subtitle">Prova de conceito executada com base de teste. Conseguimos extrair, estruturar e comparar dados de NFe contra SAP em tempo real.</p>
+            <div class="highlight-box">
+                <strong>Próximo passo:</strong> Validar em 1.000 notas reais para entender o escopo real do problema e desenhar a solução de produto.
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="section animated-item">
+            <h2 class="section-title">O que a POC entregou</h2>
+            <p class="section-subtitle">Números que demonstram que a tecnologia funciona para cruzar dados fiscais.</p>
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-label">XMLs Parseados</div>
+                    <div class="metric-value">9</div>
+                    <div class="metric-desc">Arquivos de NFe extraídos da base de teste.</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Registros SAP Validados</div>
+                    <div class="metric-value">4</div>
+                    <div class="metric-desc">Notas com integridade de dados confirmada.</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Divergências Detectadas</div>
+                    <div class="metric-value">23</div>
+                    <div class="metric-desc">Diferenças encontradas entre XML e SAP.</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Impacto Identificado</div>
+                    <div class="metric-value">R$ 462</div>
+                    <div class="metric-desc">Valor total das divergências na amostra.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section animated-item">
+            <div class="insight-box">
+                <h4>🔍 O que isso significa?</h4>
+                <p><strong>100% das notas validadas tinham divergências.</strong> A tecnologia consegue detectar diferenças com precisão entre a fonte oficial (XML) e o cálculo local (SAP). O próximo passo é medir a magnitude e a frequência em um ambiente de produção.</p>
+            </div>
+        </section>
+
+        <section class="section animated-item">
+            <h2 class="section-title">Exemplos de divergências encontradas</h2>
+            <p class="section-subtitle">Comparação lado-a-lado: valores do XML (oficial) vs. valores calculados pelo SAP.</p>
+            <div class="table-container">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>NFe</th><th>Item</th><th>Imposto</th><th>Valor XML</th><th>Valor SAP</th><th>Diferença</th><th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>340271</strong></td><td>3</td><td>PIS</td><td class="value-xml">R$ 0,00</td><td class="value-sap">R$ 10,75</td><td>R$ 10,75</td><td><span class="badge">Detectado</span></td></tr>
+                        <tr><td><strong>340271</strong></td><td>3</td><td>COFINS</td><td class="value-xml">R$ 0,00</td><td class="value-sap">R$ 49,52</td><td>R$ 49,52</td><td><span class="badge">Detectado</span></td></tr>
+                        <tr><td><strong>799114</strong></td><td>0</td><td>ICMS</td><td class="value-xml">R$ 331,56</td><td class="value-sap">R$ 497,34</td><td>R$ 165,78</td><td><span class="badge">Detectado</span></td></tr>
+                        <tr><td><strong>797932</strong></td><td>0</td><td>ICMS</td><td class="value-xml">R$ 118,25</td><td class="value-sap">R$ 160,28</td><td>R$ 42,03</td><td><span class="badge">Detectado</span></td></tr>
+                        <tr><td><strong>797932</strong></td><td>1</td><td>ICMS</td><td class="value-xml">R$ 44,12</td><td class="value-sap">R$ 57,56</td><td>R$ 13,44</td><td><span class="badge">Detectado</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section animated-item">
+            <h2 class="section-title">Roadmap: Do POC ao Produto</h2>
+            <p class="section-subtitle">Três fases para ir de prova de conceito a uma solução em produção.</p>
+            <div class="phase-grid">
+                <div class="phase-card">
+                    <div class="phase-header"><div class="phase-number">1</div><h3>POC: Validação da Tecnologia</h3></div>
+                    <span class="phase-status completed">✓ Concluído</span>
+                    <p>Objetivo alcançado: conseguimos parsear e cruzar estruturas XML ↔ SAP com sucesso.</p>
+                    <ul class="phase-list">
+                        <li>Parser XML funcional</li>
+                        <li>Join SAP por KeyNfe</li>
+                        <li>Comparação com tolerância 0%</li>
+                    </ul>
+                </div>
+                <div class="phase-card">
+                    <div class="phase-header"><div class="phase-number">2</div><h3>Análise em Produção</h3></div>
+                    <span class="phase-status planned">→ Próximo Passo</span>
+                    <p>Validar em 1.000 notas reais (múltiplas empresas) para entender o escopo do problema e desenhar a solução.</p>
+                    <ul class="phase-list">
+                        <li>Export sincronizado de dados SAP</li>
+                        <li>1.000 notas de produção (TpAmb=1)</li>
+                        <li>Relatório de impacto real</li>
+                    </ul>
+                    <div class="phase-details">
+                        💰 Investimento: R$ 6.000<br>
+                        ⏱️ Prazo: 7 dias úteis após entrega do report
+                    </div>
+                </div>
+                <div class="phase-card">
+                    <div class="phase-header"><div class="phase-number">3</div><h3>Produto com IA</h3></div>
+                    <span class="phase-status planned">→ Após Fase 2</span>
+                    <p>Transformar padrões e dados da Fase 2 em plataforma inteligente com automação preditiva.</p>
+                    <ul class="phase-list">
+                        <li>Integração inteligente com SAP</li>
+                        <li>Detecção automática de padrões</li>
+                        <li>Recomendações baseadas em IA</li>
+                        <li>Auditoria assistida</li>
+                    </ul>
+                    <div class="phase-details">
+                        Escopo e modelo de negócio a definir com base na Fase 2
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section animated-item">
+            <h2 class="section-title">O que você compra na Fase 2</h2>
+            
+            <div style="background: white; border-radius: var(--radius); border: 2px solid var(--primary); overflow: hidden; box-shadow: var(--shadow-lg);">
+                <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 2rem;">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Fase 2: Análise em Produção</h3>
+                    <p style="opacity: 0.9; font-size: 1.1rem;">1.000 notas fiscais de produção • Múltiplas empresas • Report completo</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0; border-top: 1px solid var(--border);">
+                    <!-- WHAT -->
+                    <div style="padding: 2rem; border-right: 1px solid var(--border);">
+                        <h4 style="color: var(--primary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; font-weight: 700;">📋 O QUÊ</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">✓ Validação de 1.000 NFes reais</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">✓ Dados de múltiplas empresas</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">✓ Ambiente de produção (TpAmb=1)</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">✓ Parser + Comparação XML ↔ SAP</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">✓ Todos padrões catalogados</li>
+                        </ul>
+                    </div>
+
+                    <!-- WHEN -->
+                    <div style="padding: 2rem; border-right: 1px solid var(--border);">
+                        <h4 style="color: var(--primary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; font-weight: 700;">🕐 QUANDO</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">Dia 1: Entrada de dados sincronizados</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">Dias 2-5: Processamento paralelo</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">Dia 6: Relatório final consolidado</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;"><strong style="color: var(--primary);">Dias 7+:</strong> Entrega e suporte</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6; font-style: italic; margin-top: 0.5rem;">Total: 7 dias úteis</li>
+                        </ul>
+                    </div>
+
+                    <!-- HOW -->
+                    <div style="padding: 2rem; border-right: 1px solid var(--border);">
+                        <h4 style="color: var(--primary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; font-weight: 700;">⚙️ COMO</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">• Export sincronizado SAP</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">• Parser XML de NFes</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">• Join por KeyNfe (não DocEntry)</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">• Comparação 0% tolerância</li>
+                            <li style="padding: 0.5rem 0; color: var(--text-light); line-height: 1.6;">• Classificação automática</li>
+                        </ul>
+                    </div>
+
+                    <!-- HOW MUCH -->
+                    <div style="padding: 2rem; background: #f8fafc;">
+                        <h4 style="color: var(--primary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; font-weight: 700;">💰 QUANTO</h4>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem;">R$ 6.000</div>
+                        <p style="color: var(--text-light); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;">
+                            <strong style="color: var(--text-dark);">Condições:</strong><br>
+                            • 50% no aceite<br>
+                            • 50% na entrega
+                        </p>
+                    </div>
+                </div>
+
+                <!-- DELIVERABLES -->
+                <div style="background: #f8fafc; padding: 2rem; border-top: 1px solid var(--border);">
+                    <h4 style="color: var(--text-dark); font-size: 1rem; margin-bottom: 1rem; font-weight: 700;">📦 O QUE VOCÊ RECEBE</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                        <div>
+                            <p style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">📊 Dashboard Executivo</p>
+                            <p style="font-size: 0.9rem; color: var(--text-light);">Estatísticas consolidadas, distribuição por empresa, tendências</p>
+                        </div>
+                        <div>
+                            <p style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">📋 Relatório Detalhado</p>
+                            <p style="font-size: 0.9rem; color: var(--text-light);">1.000 notas mapeadas, todos padrões catalogados, exemplos reais</p>
+                        </div>
+                        <div>
+                            <p style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">🎯 Escopo da Fase 3</p>
+                            <p style="font-size: 0.9rem; color: var(--text-light);">Recomendações para produto baseado em dados reais</p>
+                        </div>
+                        <div>
+                            <p style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">📈 ROI Confirmado</p>
+                            <p style="font-size: 0.9rem; color: var(--text-light);">Projeção real (não teórica) do impacto financeiro</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="cta-section animated-item">
+            <h2>Quer entender o escopo real do problema?</h2>
+            <p>1.000 notas de produção • 7 dias úteis • Dados concretos para a decisão da Fase 3.</p>
+            <a href="https://wa.me/5562982829228?text=Quero%20saber%20mais%20sobre%20a%20Fase%202%20-%20An%C3%A1lise%20em%20Produ%C3%A7%C3%A3o" class="cta-button">Solicitar Proposta da Fase 2</a>
+        </section>
+
+        <section class="section animated-item">
+            <h2 class="section-title">Sobre a POC</h2>
+            <p class="section-subtitle">Transparência total sobre metodologia e limitações.</p>
+            <div class="credibility-grid">
+                <div class="credibility-card"><h4>✅ Validado</h4><ul><li>• Parser XML funcional</li><li>• Join por KeyNfe</li><li>• 23 divergências reais detectadas</li><li>• 0% de falsos positivos (precisão 100%)</li></ul></div>
+                <div class="credibility-card"><h4>⚠️ Limitações</h4><ul><li>• Base de teste, não produção</li><li>• Amostra de apenas 4 notas validadas</li><li>• 5 notas descartadas por dados de teste</li><li>• Resultados ainda não extrapoláveis</li></ul></div>
+                <div class="credibility-card"><h4>🎯 Próximo Passo</h4><ul><li>• Aplicar em 1.000 notas reais</li><li>• Entender o padrão em produção</li><li>• Validar ROI com dados concretos</li><li>• Desenhar escopo do produto (Fase 3)</li></ul></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p><strong>Validador Fiscal - Prova de Conceito</strong></p>
+        <p>Tecnologia validada • Próximo passo: Fase 2 em Produção</p>
+        <p style="margin-top: 1rem; opacity: 0.6; font-size: 0.85rem;">
+            Dataset da POC: 9 XMLs • 4 notas validadas • 23 divergências • R$ 462 de impacto
+        </p>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animated-item').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
